@@ -40,7 +40,12 @@ class SwarmGameManager(BaseGameManager, DefaultGameManagerMixin):
         hf_push_frequency: int = 20,
         **kwargs,
     ):
-        initial_peers = coordinator.get_bootnodes()
+#         initial_peers = coordinator.get_bootnodes()
+        initial_peers = [
+            '/ip4/13.211.128.59/tcp/30021/p2p/QmQ2gEXoPJg6iMBSUFWGzAabS2VhnzuS782Y637hGjfsRJ',
+            '/ip4/13.211.128.59/tcp/30022/p2p/QmWhiaLrx3HRZfgXc2i7KW5nMUNK7P9tRc71yFJdGEZKkC',
+            '/ip4/13.211.128.59/tcp/30023/p2p/QmQa1SCfYTxx7RvU7qJJRo79Zm1RAwPpkeLueDVJuBBmFp'
+        ]
         communication_kwargs['initial_peers'] = initial_peers
         get_logger().info(f"bootnodes: {initial_peers}")
         rewards_ollama_model = kwargs.get("rewards_ollama_model", 'qwen2.5-coder:1.5b-instruct')
@@ -126,7 +131,7 @@ class SwarmGameManager(BaseGameManager, DefaultGameManagerMixin):
             my_signal = signal_by_agent[self.peer_id]
         else:
             my_signal = 0
-        my_signal = (my_signal + 1) * (my_signal > 0) + my_signal * (my_signal <= 0)
+        my_signal = (my_signal + 1) * (my_signal > 0) + 0 * (my_signal <= 0)
         return my_signal
 
     def _try_submit_to_chain(self, signal_by_agent):
@@ -171,7 +176,7 @@ class SwarmGameManager(BaseGameManager, DefaultGameManagerMixin):
 
         # Try to submit to chain again if necessary, but don't update our signal twice
         if not self.submitted_this_round:
-            try:    
+            try:
                 signal_by_agent = self._get_total_rewards_by_agent()
             except Exception as e:
                 get_logger().debug(f"Error getting total rewards by agent: {e}")
